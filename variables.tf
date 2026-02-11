@@ -18,9 +18,9 @@ EOT
     location                  = string
     name                      = string
     resource_group_name       = string
-    instance_count            = optional(number, 1)
+    instance_count            = optional(number) # Default: 1
     tags                      = optional(map(string))
-    tier                      = optional(string, "S1")
+    tier                      = optional(string) # Default: "S1"
     virtual_network_subnet_id = optional(string)
   }))
 }
