@@ -18,31 +18,18 @@ EOT
     location                  = string
     name                      = string
     resource_group_name       = string
-    instance_count            = optional(number) # Default: 1
+    instance_count            = optional(number)
     tags                      = optional(map(string))
-    tier                      = optional(string) # Default: "S1"
+    tier                      = optional(string)
     virtual_network_subnet_id = optional(string)
   }))
-  validation {
-    condition = alltrue([
-      for k, v in var.container_registry_agent_pools : (
-        length(v.name) >= 3 && length(v.name) <= 20
-      )
-    ])
-    error_message = "must be between 3 and 20 characters"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.container_registry_agent_pools : (
-        v.tier == null || (contains(["S1", "S2", "S3", "I6"], v.tier))
-      )
-    ])
-    error_message = "must be one of: S1, S2, S3, I6"
-  }
   # --- Unconfirmed validation candidates, derived from azurerm_container_registry_agent_pool's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
   # Review, translate into a real validation{} block above, and delete once confirmed.
+  # path: name
+  #   condition: length(value) >= 3 && length(value) <= 20
+  #   message:   must be between 3 and 20 characters
   # path: resource_group_name
   #   condition: length(value) <= 90
   #   message:   [from resourcegroups.ValidateName: invalid when len(value) > 90]
@@ -67,6 +54,9 @@ EOT
   #   condition: length(value) <= 50
   #   message:   [from validate2.ContainerRegistryName: invalid when len(value) > 50]
   #   source:    [from validate2.ContainerRegistryName: invalid when len(value) > 50]
+  # path: tier
+  #   condition: contains(["S1", "S2", "S3", "I6"], value)
+  #   message:   must be one of: S1, S2, S3, I6
   # path: virtual_network_subnet_id
   #   source:    [from commonids.ValidateSubnetID] !ok
   # path: virtual_network_subnet_id
